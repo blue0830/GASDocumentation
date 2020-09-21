@@ -1,13 +1,15 @@
-// Copyright 2019 Dan Kestranek.
+// Copyright 2020 Dan Kestranek.
 
 
-#include "GDCharacterBase.h"
-#include "Abilities/AttributeSets/GDAttributeSetBase.h"
-#include "Abilities/GDGameplayAbility.h"
+#include "Characters/GDCharacterBase.h"
+#include "Characters/Abilities/AttributeSets/GDAttributeSetBase.h"
+#include "Characters/Abilities/GDAbilitySystemComponent.h"
+#include "Characters/Abilities/GDGameplayAbility.h"
+#include "Characters/GDCharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "GDAbilitySystemComponent.h"
-#include "GDCharacterMovementComponent.h"
-#include "GDDamageTextWidgetComponent.h"
+#include "UI/GDDamageTextWidgetComponent.h"
+#include "Custom/Abilities/GDGABomb.h"
+#include "Characters/Heroes/Abilities/GDGA_FireGun.h"
 
 // Sets default values
 AGDCharacterBase::AGDCharacterBase(const class FObjectInitializer& ObjectInitializer) :
@@ -31,7 +33,7 @@ AGDCharacterBase::AGDCharacterBase(const class FObjectInitializer& ObjectInitial
 
 UAbilitySystemComponent * AGDCharacterBase::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent;
+	return AbilitySystemComponent.Get();
 }
 
 bool AGDCharacterBase::IsAlive() const
@@ -46,7 +48,7 @@ int32 AGDCharacterBase::GetAbilityLevel(EGDAbilityInputID AbilityID) const
 
 void AGDCharacterBase::RemoveCharacterAbilities()
 {
-	if (Role != ROLE_Authority || !AbilitySystemComponent || !AbilitySystemComponent->CharacterAbilitiesGiven)
+	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || !AbilitySystemComponent->CharacterAbilitiesGiven)
 	{
 		return;
 	}
@@ -239,7 +241,7 @@ void AGDCharacterBase::Die()
 
 	OnCharacterDied.Broadcast(this);
 
-	if (AbilitySystemComponent)
+	if (AbilitySystemComponent.IsValid())
 	{
 		AbilitySystemComponent->CancelAllAbilities();
 
@@ -274,7 +276,7 @@ void AGDCharacterBase::BeginPlay()
 void AGDCharacterBase::AddCharacterAbilities()
 {
 	// Grant abilities, but only on the server	
-	if (Role != ROLE_Authority || !AbilitySystemComponent|| AbilitySystemComponent->CharacterAbilitiesGiven)
+	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || AbilitySystemComponent->CharacterAbilitiesGiven)
 	{
 		return;
 	}
@@ -284,20 +286,26 @@ void AGDCharacterBase::AddCharacterAbilities()
 		AbilitySystemComponent->GiveAbility(
 			FGameplayAbilitySpec(StartupAbility, GetAbilityLevel(StartupAbility.GetDefaultObject()->AbilityID), static_cast<int32>(StartupAbility.GetDefaultObject()->AbilityInputID), this));
 	}
+	//TSubclassOf<UGDGABomb> GABombClass1 = LoadClass<UGDGABomb>()
+	//AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(GDGABomb, GetAbilityLevel((&GABombClass)->GetDefaultObject()->AbilityID), static_cast<int32>((&GABombClass)->GetDefaultObject()->AbilityInputID), this));
+	
+	TSubclassOf<UGDGABomb> GABombClass = UGDGABomb::StaticClass();
+	FGameplayAbilitySpec spec = FGameplayAbilitySpec(GABombClass, GetAbilityLevel((&GABombClass)->GetDefaultObject()->AbilityID), static_cast<int32>((&GABombClass)->GetDefaultObject()->AbilityInputID), this);
+	AbilitySystemComponent->GiveAbility(spec);
 
 	AbilitySystemComponent->CharacterAbilitiesGiven = true;
 }
 
 void AGDCharacterBase::InitializeAttributes()
 {
-	if (!AbilitySystemComponent)
+	if (!AbilitySystemComponent.IsValid())
 	{
 		return;
 	}
 
 	if (!DefaultAttributes)
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s() Missing DefaultAttributes for %s. Please fill in the character's Blueprint."), TEXT(__FUNCTION__), *GetName());
+		UE_LOG(LogTemp, Error, TEXT("%s() Missing DefaultAttributes for %s. Please fill in the character's Blueprint."), *FString(__FUNCTION__), *GetName());
 		return;
 	}
 
@@ -308,13 +316,13 @@ void AGDCharacterBase::InitializeAttributes()
 	FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributes, GetCharacterLevel(), EffectContext);
 	if (NewHandle.IsValid())
 	{
-		FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
+		FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent.Get());
 	}
 }
 
 void AGDCharacterBase::AddStartupEffects()
 {
-	if (Role != ROLE_Authority || !AbilitySystemComponent || AbilitySystemComponent->StartupEffectsApplied)
+	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent.IsValid() || AbilitySystemComponent->StartupEffectsApplied)
 	{
 		return;
 	}
@@ -327,7 +335,7 @@ void AGDCharacterBase::AddStartupEffects()
 		FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, GetCharacterLevel(), EffectContext);
 		if (NewHandle.IsValid())
 		{
-			FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
+			FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent.Get());
 		}
 	}
 

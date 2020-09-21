@@ -1,11 +1,11 @@
-// Copyright 2019 Dan Kestranek.
+// Copyright 2020 Dan Kestranek.
 
 
-#include "GDGA_FireGun.h"
+#include "Characters/Heroes/Abilities/GDGA_FireGun.h"
 #include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Characters/Heroes/GDHeroCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "GDHeroCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 
 UGDGA_FireGun::UGDGA_FireGun()
@@ -70,7 +70,7 @@ void UGDGA_FireGun::EventReceived(FGameplayTag EventTag, FGameplayEventData Even
 
 	// Only spawn projectiles on the Server.
 	// Predicting projectiles is an advanced topic not covered in this example.
-	if (GetOwningActorFromActorInfo()->Role == ROLE_Authority && EventTag == FGameplayTag::RequestGameplayTag(FName("Event.Montage.SpawnProjectile")))
+	if (GetOwningActorFromActorInfo()->GetLocalRole() == ROLE_Authority && EventTag == FGameplayTag::RequestGameplayTag(FName("Event.Montage.SpawnProjectile")))
 	{
 		AGDHeroCharacter* Hero = Cast<AGDHeroCharacter>(GetAvatarActorFromActorInfo());
 		if (!Hero)

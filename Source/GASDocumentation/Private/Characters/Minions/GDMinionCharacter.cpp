@@ -1,13 +1,13 @@
-// Copyright 2019 Dan Kestranek.
+// Copyright 2020 Dan Kestranek.
 
 
-#include "GDMinionCharacter.h"
+#include "Characters/Minions/GDMinionCharacter.h"
+#include "Characters/Abilities/GDAbilitySystemComponent.h"
+#include "Characters/Abilities/AttributeSets/GDAttributeSetBase.h"
 #include "Components/CapsuleComponent.h"
-#include "GDAbilitySystemComponent.h"
-#include "GDAttributeSetBase.h"
-#include "GDFloatingStatusBarWidget.h"
+#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "WidgetComponent.h"
+#include "UI/GDFloatingStatusBarWidget.h"
 
 AGDMinionCharacter::AGDMinionCharacter(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -40,7 +40,7 @@ AGDMinionCharacter::AGDMinionCharacter(const class FObjectInitializer& ObjectIni
 	UIFloatingStatusBarClass = StaticLoadClass(UObject::StaticClass(), nullptr, TEXT("/Game/GASDocumentation/UI/UI_FloatingStatusBar_Minion.UI_FloatingStatusBar_Minion_C"));
 	if (!UIFloatingStatusBarClass)
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s() Failed to find UIFloatingStatusBarClass. If it was moved, please update the reference location in C++."), TEXT(__FUNCTION__));
+		UE_LOG(LogTemp, Error, TEXT("%s() Failed to find UIFloatingStatusBarClass. If it was moved, please update the reference location in C++."), *FString(__FUNCTION__));
 	}
 }
 
@@ -48,7 +48,7 @@ void AGDMinionCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (AbilitySystemComponent)
+	if (AbilitySystemComponent.IsValid())
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 		InitializeAttributes();
@@ -101,7 +101,7 @@ void AGDMinionCharacter::HealthChanged(const FOnAttributeChangeData & Data)
 
 void AGDMinionCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
-	if (NewCount > 0 && AbilitySystemComponent)
+	if (NewCount > 0)
 	{
 		FGameplayTagContainer AbilityTagsToCancel;
 		AbilityTagsToCancel.AddTag(FGameplayTag::RequestGameplayTag(FName("Ability")));

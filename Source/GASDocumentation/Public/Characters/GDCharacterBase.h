@@ -1,4 +1,4 @@
-// Copyright 2019 Dan Kestranek.
+// Copyright 2020 Dan Kestranek.
 
 #pragma once
 
@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
-#include "GASDocumentation.h"
+#include "GASDocumentation/GASDocumentation.h"
 #include "GDCharacterBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterBaseHitReactDelegate, EGDHitReactDirection, Direction);
@@ -97,10 +97,19 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY()
-	class UGDAbilitySystemComponent* AbilitySystemComponent;
+	// Instead of TWeakObjectPtrs, you could just have UPROPERTY() hard references or no references at all and just call
+	// GetAbilitySystem() and make a GetAttributeSetBase() that can read from the PlayerState or from child classes.
+	// Just make sure you test if the pointer is valid before using.
+	// I opted for TWeakObjectPtrs because I didn't want a shared hard reference here and I didn't want an extra function call of getting
+	// the ASC/AttributeSet from the PlayerState or child classes every time I referenced them in this base class.
 
+	TWeakObjectPtr<class UGDAbilitySystemComponent> AbilitySystemComponent;
 	TWeakObjectPtr<class UGDAttributeSetBase> AttributeSetBase;
+	//TWeakObjectPtr<class UGDGABomb> GDGABomb;
+	TWeakObjectPtr<class UGDGABomb> GDGABomb;
+
+	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
+	TSubclassOf<UGDGABomb> GDGABombClass;
 
 	FGameplayTag HitDirectionFrontTag;
 	FGameplayTag HitDirectionBackTag;
@@ -128,6 +137,7 @@ protected:
 	// These effects are only applied one time on startup
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "GASDocumentation|Abilities")
 	TArray<TSubclassOf<class UGameplayEffect>> StartupEffects;
+
 
 	// Grant abilities on the Server. The Ability Specs will be replicated to the owning client.
 	virtual void AddCharacterAbilities();

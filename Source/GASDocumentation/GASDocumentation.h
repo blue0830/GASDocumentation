@@ -1,11 +1,12 @@
-// Copyright 2019 Dan Kestranek.
+// Copyright 2020 Dan Kestranek.
 
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/ObjectMacros.h"
 
-#define ACTOR_ROLE_FSTRING *(FindObject<UEnum>(ANY_PACKAGE, TEXT("ENetRole"), true)->GetNameStringByValue(Role))
-#define GET_ACTOR_ROLE_FSTRING(Actor) *(FindObject<UEnum>(ANY_PACKAGE, TEXT("ENetRole"), true)->GetNameStringByValue(Actor->Role))
+#define ACTOR_ROLE_FSTRING *(FindObject<UEnum>(ANY_PACKAGE, TEXT("ENetRole"), true)->GetNameStringByValue(GetLocalRole()))
+#define GET_ACTOR_ROLE_FSTRING(Actor) *(FindObject<UEnum>(ANY_PACKAGE, TEXT("ENetRole"), true)->GetNameStringByValue(Actor->GetLocalRole()))
 
 UENUM(BlueprintType)
 enum class EGDHitReactDirection : uint8
@@ -45,6 +46,6 @@ enum class EGDAbilityInputID : uint8
 	Sprint			UMETA(DisplayName = "Sprint"),
 	// 9 Jump
 	Jump			UMETA(DisplayName = "Jump"),
-	// 10 F
-	Ability6		UMETA(DisplayName = "Ability6")
+	// 10 Bomb
+	Bomb			UMETA(DisplayName = "Bomb")
 };

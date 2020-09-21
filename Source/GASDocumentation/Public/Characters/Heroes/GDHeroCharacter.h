@@ -1,10 +1,9 @@
-// Copyright 2019 Dan Kestranek.
+// Copyright 2020 Dan Kestranek.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Characters/GDCharacterBase.h"
-#include "Pickupable.h"
 #include "GDHeroCharacter.generated.h"
 
 /**
@@ -33,18 +32,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "GASDocumentation|Camera")
 	FVector GetStartingCameraBoomLocation();
-
-	UFUNCTION(BlueprintCallable, Category = "Projectile")
-	void LaunchPickedupProjectile(const TArray<FGameplayEffectSpecHandle>& EffectHandles);
-
-	UFUNCTION(BlueprintCallable, Category = "Projectile")
-	bool HasPickedupAnyProjectiles() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Projectile")
-	TArray<TSubclassOf<UGameplayEffect>> GetCurrentProjectileEffects() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Projectile")
-	float GetCurrentProjectileDamage() const;
 
 	class UGDFloatingStatusBarWidget* GetFloatingStatusBar();
 
@@ -80,15 +67,17 @@ protected:
 	UPROPERTY()
 	class UGDFloatingStatusBarWidget* UIFloatingStatusBar;
 
-	TArray<IPickupable*> PickedupProjectiles;
-
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "GASDocumentation|UI")
 	class UWidgetComponent* UIFloatingStatusBarComponent;
+
+	bool ASCInputBound = false;
 
 	FGameplayTag DeadTag;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void PostInitializeComponents() override;
 
 	// Mouse
 	void LookUp(float Value);
@@ -116,12 +105,8 @@ protected:
 	// Client only
 	virtual void OnRep_PlayerState() override;
 
-	void PickupProjectile(IPickupable* PickedupItem);
-
-private:
-
-	friend class AGDThrowableProjectile;
-
-	UPROPERTY()
-	class UInputComponent* CachedInputComponent;
+	// Called from both SetupPlayerInputComponent and OnRep_PlayerState because of a potential race condition where the PlayerController might
+	// call ClientRestart which calls SetupPlayerInputComponent before the PlayerState is repped to the client so the PlayerState would be null in SetupPlayerInputComponent.
+	// Conversely, the PlayerState might be repped before the PlayerController calls ClientRestart so the Actor's InputComponent would be null in OnRep_PlayerState.
+	void BindASCInput();
 };

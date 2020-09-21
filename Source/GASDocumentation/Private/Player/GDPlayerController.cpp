@@ -1,11 +1,11 @@
-// Copyright 2019 Dan Kestranek.
+// Copyright 2020 Dan Kestranek.
 
 
-#include "GDPlayerController.h"
+#include "Player/GDPlayerController.h"
 #include "AbilitySystemComponent.h"
-#include "GDDamageTextWidgetComponent.h"
-#include "GDHeroCharacter.h"
-#include "GDPlayerState.h"
+#include "Characters/Heroes/GDHeroCharacter.h"
+#include "Player/GDPlayerState.h"
+#include "UI/GDDamageTextWidgetComponent.h"
 #include "UI/GDHUDWidget.h"
 
 void AGDPlayerController::CreateHUD()
@@ -18,7 +18,7 @@ void AGDPlayerController::CreateHUD()
 
 	if (!UIHUDWidgetClass)
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s() Missing UIHUDWidgetClass. Please fill in on the Blueprint of the PlayerController."), TEXT(__FUNCTION__));
+		UE_LOG(LogTemp, Error, TEXT("%s() Missing UIHUDWidgetClass. Please fill in on the Blueprint of the PlayerController."), *FString(__FUNCTION__));
 		return;
 	}
 
@@ -58,7 +58,7 @@ void AGDPlayerController::CreateHUD()
 	DamageNumberClass = StaticLoadClass(UObject::StaticClass(), nullptr, TEXT("/Game/GASDocumentation/UI/WC_DamageText.WC_DamageText_C"));
 	if (!DamageNumberClass)
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s() Failed to find DamageNumberClass. If it was moved, please update the reference location in C++."), TEXT(__FUNCTION__));
+		UE_LOG(LogTemp, Error, TEXT("%s() Failed to find DamageNumberClass. If it was moved, please update the reference location in C++."), *FString(__FUNCTION__));
 	}
 }
 
