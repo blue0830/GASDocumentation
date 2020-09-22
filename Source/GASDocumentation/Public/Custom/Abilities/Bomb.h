@@ -31,8 +31,11 @@ protected:
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComponent,class AActor* OtherActor,class UPrimitiveComponent* OtherComponent,int32 OtherBodyIndex,bool bFromSweep,const FHitResult& SweepResult);
 
 public:
-	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite,VisibleAnywhere)
 	UStaticMeshComponent* Sphere;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UStaticMesh* SphereMesh;
 
 	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
 	class USphereComponent* SphereCollision;

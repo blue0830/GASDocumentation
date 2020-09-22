@@ -17,7 +17,6 @@ UGDGABomb::UGDGABomb() {
 	AbilityID = EGDAbilityInputID::Bomb;
 	AbilityInputID = EGDAbilityInputID::Bomb;
 	
-
 }
 
 void UGDGABomb::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -104,7 +103,8 @@ void UGDGABomb::OnComplete(const FGameplayAbilityTargetDataHandle& Data)
 		const FGameplayAbilityTargetData_LocationInfo* locationInfo = (FGameplayAbilityTargetData_LocationInfo *)(data);
 		FVector pos = locationInfo->TargetLocation.LiteralTransform.GetLocation();
 		pos.Z = 150;
-		bomb = GetWorld()->SpawnActor<ABomb>(ABomb::StaticClass(), pos,FRotator::ZeroRotator,FActorSpawnParameters());
+		
+		bomb = GetWorld()->SpawnActor<ABomb>(/*ABomb::StaticClass()*/bombClass, pos,FRotator::ZeroRotator,FActorSpawnParameters());
 		bomb->SetInstigator(owner);
 		//bomb->Sphere->SetRelativeLocation(FVector::ZeroVector);
 		bomb->damageEffectSpecHandle = damageEffectSpecHandle;

@@ -53,6 +53,9 @@ public:
 	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)
 	float bombDamage;
 
+	UPROPERTY(BlueprintReadOnly,EditAnywhere)
+	TSubclassOf<ABomb> bombClass;
+
 	ABomb* bomb;
 
 	UPROPERTY(BlueprintReadOnly,VisibleAnywhere)

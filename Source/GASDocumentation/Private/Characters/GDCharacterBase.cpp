@@ -289,7 +289,7 @@ void AGDCharacterBase::AddCharacterAbilities()
 	//TSubclassOf<UGDGABomb> GABombClass1 = LoadClass<UGDGABomb>()
 	//AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(GDGABomb, GetAbilityLevel((&GABombClass)->GetDefaultObject()->AbilityID), static_cast<int32>((&GABombClass)->GetDefaultObject()->AbilityInputID), this));
 	
-	TSubclassOf<UGDGABomb> GABombClass = UGDGABomb::StaticClass();
+	TSubclassOf<UGDGABomb> GABombClass = StaticLoadClass(UObject::StaticClass(), nullptr, TEXT("/Game/GASDocumentation/Characters/Hero/Abilities/Bomb/GA_GDBomb_BP.GA_GDBomb_BP_C"));//UGDGABomb::StaticClass();
 	FGameplayAbilitySpec spec = FGameplayAbilitySpec(GABombClass, GetAbilityLevel((&GABombClass)->GetDefaultObject()->AbilityID), static_cast<int32>((&GABombClass)->GetDefaultObject()->AbilityInputID), this);
 	AbilitySystemComponent->GiveAbility(spec);
 

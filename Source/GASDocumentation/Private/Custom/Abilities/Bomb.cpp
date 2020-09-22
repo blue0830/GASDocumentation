@@ -12,25 +12,30 @@ ABomb::ABomb()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
 	SetReplicates(true);
+
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(FName("SphereCollision"));
 	SphereCollision->SetupAttachment(RootComponent);
 	SphereCollision->SetSphereRadius(51);
 
-	Sphere = CreateDefaultSubobject<UStaticMeshComponent>(FName("Sphere"));
-	Sphere->SetupAttachment(SphereCollision);
-	//Sphere->AttachTo(RootComponent);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereMeshAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
-	if (SphereMeshAsset.Succeeded()) {
-		Sphere->SetStaticMesh(SphereMeshAsset.Object);
-	}
-	//Sphere->SetUsingAbsoluteLocation(true);
-	Sphere->SetRelativeLocation(FVector::ZeroVector);
-	Sphere->SetWorldScale3D(FVector(0.3f, 0.3f, 0.3f));
-	static ConstructorHelpers::FObjectFinder<UMaterial> SphereMaterialAsset(TEXT("Material'/Game/GASDocumentation/Characters/Hero/Abilities/Meteor/Effects/Masters/M_Trans_MeshEmit_Master.M_Trans_MeshEmit_Master'"));
-	if (SphereMaterialAsset.Succeeded()) {
-		Sphere->SetMaterial(0,SphereMaterialAsset.Object);
-	}
+	//RootComponent = SphereCollision;
+
+	//Sphere = CreateDefaultSubobject<UStaticMeshComponent>(FName("Sphere"));
+	//Sphere->SetupAttachment(SphereCollision);
+	//Sphere->SetRelativeLocation(FVector::ZeroVector);
+	//Sphere->SetWorldScale3D(FVector(0.3f, 0.3f, 0.3f));
+
+	//static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereMeshAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
+	//if (SphereMeshAsset.Succeeded()) {
+	//	Sphere->SetStaticMesh(SphereMeshAsset.Object);
+	//}
+	////Sphere->SetUsingAbsoluteLocation(true);
+
+	//static ConstructorHelpers::FObjectFinder<UMaterial> SphereMaterialAsset(TEXT("Material'/Game/GASDocumentation/Characters/Hero/Abilities/Meteor/Effects/Masters/M_Trans_MeshEmit_Master.M_Trans_MeshEmit_Master'"));
+	//if (SphereMaterialAsset.Succeeded()) {
+	//	Sphere->SetMaterial(0,SphereMaterialAsset.Object);
+	//}
 
 	
 	
